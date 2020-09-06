@@ -1,21 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
+import "react-native-gesture-handler";
+
+import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
+import { light, mapping } from '@eva-design/eva';
+
+import { AppNavigator } from './src/navigation/AppNavigator';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Routes } from './src/navigation/AppRoutes';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { default as theme } from "./src/assets/theme.json";
 
-export default function App() {
+export default () => {
+
+  const isAuthorized = true;
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <IconRegistry icons={EvaIconsPack}/>
+      <ApplicationProvider mapping={mapping} theme={{ ...light, ...theme }}>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <AppNavigator initialRouteName={isAuthorized ? Routes.HOME : Routes.AUTH}/>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </ApplicationProvider>
+    </>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+};

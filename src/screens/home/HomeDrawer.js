@@ -1,14 +1,38 @@
-import { Drawer, DrawerElement, DrawerItem, DrawerItemElement, IndexPath, Layout, Text } from '@ui-kitten/components';
-import { ImageBackground, ImageBackgroundProps, StyleSheet } from 'react-native';
+import {
+  Avatar,
+  Drawer,
+  DrawerElement,
+  DrawerItem,
+  DrawerItemElement,
+  Icon,
+  IndexPath,
+  Layout,
+  StyleService,
+  Text,
+  useStyleSheet,
+} from '@ui-kitten/components';
 
 import React from 'react';
+import { View } from 'react-native';
+import { useSafeArea } from "react-native-safe-area-context";
 
-const DrawerHeader = () => (
-  <ImageBackground
-    style={styles.header}
-    source={require('../../assets/image-background.jpg')}
-  />
-);
+const DrawerHeader = () =>  {
+  const insets = useSafeArea();
+  const styles = useStyleSheet(themedStyles);
+  return (
+    <Layout style={styles.header} level="2">
+        <View style={styles.profileContainer}>
+          <Avatar
+            size="giant"
+            source={require("../../assets/images/icon.png")}
+          />
+          <Text style={styles.profileName} category="h6">
+            Food Yours
+          </Text>
+        </View>
+      </Layout>
+  )
+} ;
 
 const Footer = (evaProps) => (
   <Layout {...evaProps}>
@@ -17,7 +41,7 @@ const Footer = (evaProps) => (
 );
 
 export const HomeDrawer = (props) => {
-
+  
   const onItemSelect = (index) => {
     const selectedTabRoute = props.state.routeNames[index.row];
     props.navigation.navigate(selectedTabRoute);
@@ -45,8 +69,37 @@ export const HomeDrawer = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const themedStyles = StyleService.create({
+  safeArea: {
+    flex: 1,
+  },
   header: {
-    height: 160,
+    height: 128,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+  },
+  profileContainer: {
+    marginTop: 36,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  profileName: {
+    marginHorizontal: 16,
+  },
+  logoutText: {
+    color: "color-primary-default",
+  },
+  icon: {
+    width: 22,
+    height: 22,
+    marginRight: 8,
+  },
+
+  logouContainer: {
+    marginHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    color: "color-primary-default",
   },
 });

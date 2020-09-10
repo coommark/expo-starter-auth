@@ -14,7 +14,7 @@ import { default as theme } from "./src/assets/theme.json";
 
 export default () => {
 
-  const isAuthorized = false;
+  const isAuthorized = true;
 
   return (
     <>

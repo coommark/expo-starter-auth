@@ -1,24 +1,52 @@
-import { Button, CheckBox, Layout, LayoutElement } from '@ui-kitten/components';
-import { EyeIcon, EyeOffIcon } from '../../assets/icons';
+import {
+  Button,
+  Layout,
+  StyleService,
+  useStyleSheet,
+} from "@ui-kitten/components";
+import { EdgeInsets, useSafeArea } from 'react-native-safe-area-context';
+import { EmailIcon, EyeIcon, EyeOffIcon } from '../../assets/icons';
 import { Formik, FormikProps } from 'formik';
-import { ImageBackground, StyleSheet, View } from 'react-native';
+import { ImageBackground, View } from 'react-native';
 import { SignInData, SignInSchema } from '../../data/SignInModel';
 
+import { AuthContext } from "../../contexts/AuthContext";
 import { FormInput } from '../../components/FormInput';
+import { KeyboardAvoidingView } from '../../components/KeyboardAvoidingView';
+import MessageAlert from "../../components/MessageAlert";
+import ProgressAlert from "../../components/ProgressAlert";
 import React from 'react';
 import { Routes } from '../../navigation/AppRoutes';
 
 export const SignInScreen = (props) => {
-
-  const [shouldRemember, setShouldRemember] = React.useState(false);
   const [passwordVisible, setPasswordVisible] = React.useState(false);
-
-  const onFormSubmit = (values) => {
-    navigateHome();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [showMessageAlert, setShowMessageAlert] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState("");
+  const styles = useStyleSheet(themedStyles);
+  const { handleSignIn } = React.useContext(AuthContext);
+  const insets = useSafeArea();
+  
+  const onFormSubmit = async (values) => {
+    console.log(values)
+    try {
+      setIsLoading(true);
+      let response = await api.signIn(values);
+      await handleSignIn(response);
+    } catch (error) {
+      setIsLoading(false);
+      actions.setErrors(error);
+      setAlertMessage(error.message);
+      setShowMessageAlert(true);
+    }
   };
 
   const navigateHome = () => {
     props.navigation.navigate(Routes.HOME);
+  };
+
+  const hideAlertMessage = () => {
+    setShowMessageAlert(false);
   };
 
   const navigateSignUp = () => {
@@ -34,88 +62,115 @@ export const SignInScreen = (props) => {
   };
 
   const renderForm = (props) => (
-    <React.Fragment>
-      <FormInput
-        id='email'
-        style={styles.formControl}
-        placeholder='Email'
-        keyboardType='email-address'
-      />
-      <FormInput
-        id='password'
-        style={styles.formControl}
-        placeholder='Password'
-        secureTextEntry={!passwordVisible}
-        icon={passwordVisible ? EyeIcon : EyeOffIcon}
-        onIconPress={onPasswordIconPress}
-      />
-      <View style={styles.resetPasswordContainer}>
-        <CheckBox
+    <>
+      <Layout style={styles.formContainer} level="1">
+        <FormInput
+          id="email"
           style={styles.formControl}
-          checked={shouldRemember}
-          onChange={setShouldRemember}
-          text='Remember Me'
+          placeholder="Email"
+          keyboardType="email-address"
+          icon={EmailIcon}
         />
-        <Button
-          appearance='ghost'
-          status='basic'
-          onPress={navigateResetPassword}>
-          Forgot password?
-        </Button>
-      </View>
+        <FormInput
+          id="password"
+          style={styles.formControl}
+          placeholder="Password"
+          secureTextEntry={!passwordVisible}
+          icon={passwordVisible ? EyeIcon : EyeOffIcon}
+          onIconPress={onPasswordIconPress}
+        />
+        <View style={styles.forgotPasswordContainer}>
+          <Button
+            style={styles.forgotPasswordButton}
+            appearance="ghost"
+            status="basic"
+            onPress={navigateResetPassword}
+          >
+            Forgot your password?
+          </Button>
+        </View>
+      </Layout>
       <Button
-        style={styles.submitButton}
-        onPress={props.handleSubmit}>
-        SIGN IN
+        style={styles.signInButton}
+        onPress={props.handleSubmit}
+        status="danger"
+      >
+        Sign In
       </Button>
-    </React.Fragment>
+
+      <Button
+        style={styles.signUpButton}
+        appearance="ghost"
+        status="basic"
+        onPress={navigateSignUp}
+      >
+        Don't have an account? Create
+      </Button>
+    </>
   );
 
   return (
-    <React.Fragment>
+    <KeyboardAvoidingView style={styles.container, { paddingTop: insets.top }}>      
       <ImageBackground
-        style={styles.appBar}
-        source={require('../../assets/image-background.jpeg')}
+        style={styles.headerContainer}
+        source={require('../../assets/image-background.jpg')}
       />
-      <Layout style={styles.formContainer}>
-        <Formik
-          initialValues={SignInData.empty()}
-          validationSchema={SignInSchema}
-          onSubmit={onFormSubmit}>
-          {renderForm}
-        </Formik>
-        <Button
-          style={styles.noAccountButton}
-          appearance='ghost'
-          status='basic'
-          onPress={navigateSignUp}>
-          Don't have an account?
-        </Button>
-      </Layout>
-    </React.Fragment>
+     
+      <Formik
+        initialValues={SignInData.empty()}
+        validationSchema={SignInSchema}
+        onSubmit={(values, actions) => {
+          handleFormSubmit(values, actions);
+        }}
+      >
+        {renderForm}
+      </Formik>
+      <ProgressAlert showAlert={isLoading} alertTitle="Authenticating..." />
+      <MessageAlert
+        showAlert={showMessageAlert}
+        alertTitle="Oops"
+        alertMessage={alertMessage}
+        closeFunction={hideAlertMessage}
+      />
+    </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
-  appBar: {
-    height: 192,
+const themedStyles = StyleService.create({
+  container: {
+    backgroundColor: "background-basic-color-1",
+  },
+  
+  headerContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 234,
   },
   formContainer: {
     flex: 1,
-    paddingVertical: 16,
     paddingHorizontal: 16,
+    paddingTop: 32,
   },
-  resetPasswordContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  signInLabel: {
+    marginTop: 16,
+    color: "#000",
+  },
+  signInButton: {
+    marginHorizontal: 16,
+  },
+  signUpButton: {
+    marginVertical: 12,
+    marginHorizontal: 16,
+  },
+  forgotPasswordContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  forgotPasswordButton: {
+    paddingHorizontal: 0,
   },
   formControl: {
     marginVertical: 4,
-  },
-  submitButton: {
-    marginVertical: 24,
-  },
-  noAccountButton: {
-    alignSelf: 'center',
+    marginTop: 8,
   },
 });

@@ -1,4 +1,4 @@
-import { Drawer, DrawerElement, DrawerItem, DrawerItemElement, IndexPath } from '@ui-kitten/components';
+import { Drawer, DrawerElement, DrawerItem, DrawerItemElement, IndexPath, Layout, Text } from '@ui-kitten/components';
 import { ImageBackground, ImageBackgroundProps, StyleSheet } from 'react-native';
 
 import React from 'react';
@@ -6,8 +6,14 @@ import React from 'react';
 const DrawerHeader = () => (
   <ImageBackground
     style={styles.header}
-    source={require('../../assets/image-background.jpeg')}
+    source={require('../../assets/image-background.jpg')}
   />
+);
+
+const Footer = (evaProps) => (
+  <Layout {...evaProps}>
+    <Text category='c2'></Text>
+  </Layout>
 );
 
 export const HomeDrawer = (props) => {
@@ -32,6 +38,7 @@ export const HomeDrawer = (props) => {
   return (
     <Drawer
       header={DrawerHeader}
+      footer={Footer}
       onSelect={onItemSelect}>
       {props.state.routes.map(createDrawerItemForRoute)}
     </Drawer>

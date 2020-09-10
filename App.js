@@ -4,6 +4,7 @@ import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
 import { light, mapping } from '@eva-design/eva';
 
 import { AppNavigator } from './src/navigation/AppNavigator';
+import AuthContextProvider from "./src/contexts/AuthContext";
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
@@ -13,17 +14,19 @@ import { default as theme } from "./src/assets/theme.json";
 
 export default () => {
 
-  const isAuthorized = true;
+  const isAuthorized = false;
 
   return (
     <>
       <IconRegistry icons={EvaIconsPack}/>
       <ApplicationProvider mapping={mapping} theme={{ ...light, ...theme }}>
-        <SafeAreaProvider>
-          <NavigationContainer>
-            <AppNavigator initialRouteName={isAuthorized ? Routes.HOME : Routes.AUTH}/>
-          </NavigationContainer>
-        </SafeAreaProvider>
+        <AuthContextProvider>
+          <SafeAreaProvider>
+            <NavigationContainer>
+              <AppNavigator initialRouteName={isAuthorized ? Routes.HOME : Routes.AUTH}/>
+            </NavigationContainer>
+          </SafeAreaProvider>
+        </AuthContextProvider>
       </ApplicationProvider>
     </>
   );

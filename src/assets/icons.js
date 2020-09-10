@@ -68,6 +68,8 @@ export const PlusIcon = (style) => (
   <Icon {...style} name='plus-outline'/>
 );
 
+export const LoginIcon = (style) => <Icon {...style} name="log-in" />;
+
 
 
 

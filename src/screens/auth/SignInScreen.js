@@ -1,3 +1,5 @@
+import * as api from "../../services/auth";
+
 import {
   Button,
   Layout,
@@ -8,6 +10,7 @@ import { EdgeInsets, useSafeArea } from 'react-native-safe-area-context';
 import { EmailIcon, EyeIcon, EyeOffIcon } from '../../assets/icons';
 import { Formik, FormikProps } from 'formik';
 import { ImageBackground, View } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { SignInData, SignInSchema } from '../../data/SignInModel';
 
 import { AuthContext } from "../../contexts/AuthContext";
@@ -15,16 +18,15 @@ import { FormInput } from '../../components/FormInput';
 import { KeyboardAvoidingView } from '../../components/KeyboardAvoidingView';
 import MessageAlert from "../../components/MessageAlert";
 import ProgressAlert from "../../components/ProgressAlert";
-import React from 'react';
 import { Routes } from '../../navigation/AppRoutes';
 
 export const SignInScreen = (props) => {
-  const [passwordVisible, setPasswordVisible] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [showMessageAlert, setShowMessageAlert] = React.useState(false);
-  const [alertMessage, setAlertMessage] = React.useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showMessageAlert, setShowMessageAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const styles = useStyleSheet(themedStyles);
-  const { handleSignIn } = React.useContext(AuthContext);
+  const { handleSignIn } = useContext(AuthContext);
   const insets = useSafeArea();
   
   const onFormSubmit = async (values) => {
@@ -33,9 +35,9 @@ export const SignInScreen = (props) => {
       setIsLoading(true);
       let response = await api.signIn(values);
       await handleSignIn(response);
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      actions.setErrors(error);
       setAlertMessage(error.message);
       setShowMessageAlert(true);
     }
@@ -70,6 +72,7 @@ export const SignInScreen = (props) => {
           placeholder="Email"
           keyboardType="email-address"
           icon={EmailIcon}
+          caretHidden
         />
         <FormInput
           id="password"
@@ -119,8 +122,8 @@ export const SignInScreen = (props) => {
       <Formik
         initialValues={SignInData.empty()}
         validationSchema={SignInSchema}
-        onSubmit={(values, actions) => {
-          handleFormSubmit(values, actions);
+        onSubmit={(values) => {
+          onFormSubmit(values);
         }}
       >
         {renderForm}

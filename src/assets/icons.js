@@ -1,5 +1,6 @@
-import { Icon, IconElement } from '@ui-kitten/components';
+import { Icon, IconElement, useTheme } from '@ui-kitten/components';
 
+import { ImageStyle } from 'react-native';
 import React from 'react';
 
 export const MenuIcon = (style) => (
@@ -70,6 +71,12 @@ export const PlusIcon = (style) => (
 
 export const LoginIcon = (style) => <Icon {...style} name="log-in" />;
 
+export const PinIcon = () => {
+  const theme = useTheme();
+  return (
+    <Icon width={16} height={16} fill={theme['text-hint-color']} name='pin'/>
+  );
+};
 
 
 
